@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="img/logo.png" type="MV">
+    <title>Prueba</title>
+
+<body>
+    
+<div class="container mt-5 text-center">
+        <img id="tituloImagen" class="texto1" src="img/titulo.png" alt="Eyeshield 21">
+        <div><img id="Imagen02" class="Imagen02" src="img/titulo02.gif" alt=""></div>
+    </div>
+
+    <div id="mvplayer" class="container mt-5">
+        <div class="d-flex justify-content-center align-items-center" style="height: auto; width: 100%;">
+            <iframe id="youtubeVideo" width="600" height="340" src="https://drive.google.com/file/d/1T2ehjkKAX_kjH3I_t1wBV7wtM2-Mske_/preview" title="Video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        
+        <video id="videoPlayer" width="600" controls preload="metadata" style="display: none; margin: 0 auto;">
+            <source id="videoSource" src="" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <div class="container mt-3">
+        <div class="d-flex flex-column align-items-center">
+            <button class="btn btnCap mb-3" type="button" data-toggle="collapse" data-target="#mvplaylist" aria-expanded="false" aria-controls="mvplaylist">
+                Mostrar/Ocultar Capítulos
+            </button>
+            
+            <div id="mvplaylist" class="collapse">
+                <ul class="list-unstyled" id="playlist">
+                    <li class="active">
+                        <a href="javascript:void(0)" onclick="changeVideo('1T2ehjkKAX_kjH3I_t1wBV7wtM2-Mske_', this)">Capítulo 66</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" onclick="changeVideo('1Wxc_QFp171_nOkzbQV_sjJIGD1PZ_-U9', this)">Capítulo 67</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" onclick="changeVideo('10m_vNGPNMIBG_MiL55fx2RYmpMqVzL5N', this)">Capítulo 68</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" onclick="changeVideo('1eUcIXHr9vIalR91EKUyvfBkJfPCCE0Ig', this)">Capítulo 69</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" onclick="changeVideo('1ymrilg1bLAg54lR9_v-cHjgbbL_mAOTU', this)">Capítulo 70</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" id="showVideoBtn">Capítulo 14 <img class="koro" src="img/koro.gif" alt="koro"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+ <script>
+    let nextVideoPreloaded = "";
+
+    function changeVideo(idOrUrl, element, isYouTube = false) {
+        const videoPlayer = document.getElementById('videoPlayer'); // El <video> local
+        const youtubeVideo = document.getElementById('youtubeVideo'); // El <iframe>
+        const Imagen02 = document.getElementById('Imagen02');
+        const tituloImagen = document.getElementById('tituloImagen');
+
+        Imagen02.style.opacity = '0';
+        tituloImagen.src = 'img/titulo.png';
+        tituloImagen.style.width = 'initial';
+
+        if (isYouTube || idOrUrl.includes('youtube.com')) {
+            videoPlayer.pause();
+            videoPlayer.style.display = 'none';
+            youtubeVideo.style.display = 'block';
+            youtubeVideo.src = idOrUrl;
+        } 
+        else if (idOrUrl.length > 20) { 
+            videoPlayer.pause();
+            videoPlayer.style.display = 'none';
+            youtubeVideo.style.display = 'block';
+            youtubeVideo.src = `https://drive.google.com/file/d/${idOrUrl}/preview`;
+        }
+        else {
+            youtubeVideo.style.display = 'none';
+            youtubeVideo.src = '';
+            videoPlayer.style.display = 'block';
+            
+            const videoSource = document.getElementById('videoSource');
+            if (videoPlayer.currentSrc !== new URL(idOrUrl, window.location.href).href) {
+                videoSource.src = idOrUrl;
+                videoPlayer.load();
+                videoPlayer.play().catch(e => console.log("Auto-play bloqueado"));
+            }
+        }
+
+        const items = document.querySelectorAll('#playlist li');
+        items.forEach(item => item.classList.remove('active'));
+        if (element) {
+            const parentLi = element.closest('li');
+            if(parentLi) parentLi.classList.add('active');
+        }
+
+        if (idOrUrl.includes('BrGxDFa2KT8')) {
+            Imagen02.style.opacity = '1';
+            changeTitleImage('img/titulo2.png', '420px', 'auto');
+        }
+        
+        preloadNextChapter(idOrUrl);
+    }
+
+    function preloadNextChapter(currentId) {
+        const links = Array.from(document.querySelectorAll('#playlist a'));
+        const currentIndex = links.findIndex(link => {
+            const onclick = link.getAttribute('onclick');
+            return onclick && onclick.includes(currentId);
+        });
+
+        if (currentIndex !== -1 && currentIndex < links.length - 1) {
+            const nextLink = links[currentIndex + 1];
+            const nextOnclick = nextLink.getAttribute('onclick');
+            const match = nextOnclick.match(/'([^']+)'/);
+            
+            if (match && !nextOnclick.includes('true')) {
+                const nextFile = match[1];
+                if (nextVideoPreloaded !== nextFile && !nextFile.includes('youtube')) {
+                    const prefetch = document.createElement('link');
+                    prefetch.rel = 'prefetch';
+                    prefetch.href = nextFile.length > 20 ? `https://drive.google.com/file/d/${nextFile}/preview` : nextFile;
+                    document.head.appendChild(prefetch);
+                    nextVideoPreloaded = nextFile;
+                }
+            }
+        }
+    }
+
+    function changeTitleImage(newSrc, newWidth, newHeight) {
+        const tituloImagen = document.getElementById('tituloImagen');
+        tituloImagen.src = newSrc;
+        tituloImagen.style.width = newWidth;
+        tituloImagen.style.height = newHeight;
+    }
+    
+    document.getElementById('videoPlayer').onended = function() {
+        const currentSrc = this.querySelector('source').getAttribute('src');
+        if (currentSrc) {
+            marcarComoVisto(currentSrc);
+            avanzarSiguiente(currentSrc);
+        }
+    };
+
+    function avanzarSiguiente(currentId) {
+        const links = Array.from(document.querySelectorAll('#playlist a'));
+        const currentIndex = links.findIndex(link => {
+            const onclick = link.getAttribute('onclick');
+            return onclick && onclick.includes(currentId);
+        });
+
+        if (currentIndex !== -1 && currentIndex < links.length - 1) {
+            links[currentIndex + 1].click();
+        }
+    }
+
+    function marcarComoVisto(id) {
+        const links = document.querySelectorAll('#playlist a');
+        links.forEach(link => {
+            const onclickAttr = link.getAttribute('onclick');
+            if (onclickAttr && onclickAttr.includes(id)) {
+                const li = link.closest('li');
+                if(li) li.classList.add('visto');
+                localStorage.setItem('visto_' + id, 'true');
+            }
+        });
+    }
+
+    window.onload = function() {
+        const links = document.querySelectorAll('#playlist a');
+        links.forEach(link => {
+            const onclickAttr = link.getAttribute('onclick');
+            if (onclickAttr) {
+                const match = onclickAttr.match(/'([^']+)'/);
+                if (match) {
+                    const id = match[1];
+                    if (localStorage.getItem('visto_' + id) === 'true') {
+                        const li = link.closest('li');
+                        if(li) li.classList.add('visto');
+                    }
+                }
+            }
+        });
+    };
+
+    document.getElementById('showVideoBtn').addEventListener('click', function(event) {
+        event.preventDefault();
+        changeVideo('https://www.youtube.com/embed/BrGxDFa2KT8', this, true);
+        marcarComoVisto('https://www.youtube.com/embed/BrGxDFa2KT8');
+    });
+</script>
+
+</body>
+</html>
+
